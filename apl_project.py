@@ -1,6 +1,24 @@
 import ply.lex as lex
 import ply.yacc as yacc
-import sys
+import openai as OpenAI
+from dotenv import load_dotenv
+import os
+
+load_dotenv
+
+client = OpenAI(
+   api_key =os.environ.get(API_KEY),
+)
+
+chat_completion = client.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": "Say this is a test",
+        }
+    ],
+    model="gpt-3.5-turbo",
+)
 
 tokens = [
  
