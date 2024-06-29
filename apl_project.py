@@ -7,7 +7,7 @@ import os
 load_dotenv
 
 client = OpenAI(
-   api_key =os.getenv(API_KEY),
+   api_key =os.getenv('API_KEY'),
 )
 
 chat_completion = client.chat.completions.create(
@@ -17,7 +17,7 @@ chat_completion = client.chat.completions.create(
             "content": "Say this is a test",
         }
     ],
-    model="gpt-3.5-turbo",
+    model="gpt-3.5-turbo-instrct",
 )
 
 tokens = [
