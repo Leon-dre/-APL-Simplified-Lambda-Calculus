@@ -1,24 +1,37 @@
 import ply.lex as lex
 import ply.yacc as yacc
-import openai as OpenAI
+import openai
 from dotenv import load_dotenv
 import os
 
-load_dotenv
+load_dotenv()
 
-client = OpenAI(
-   api_key =os.getenv('API_KEY'),
-)
+# Retrieve the API key from environment variables
+api_key = os.getenv('API_KEY')
 
-chat_completion = client.chat.completions.create(
-    messages=[
-        {
-            "role": "user",
-            "content": "Say this is a test",
-        }
-    ],
-    model="gpt-3.5-turbo-instrct",
-)
+# Check if API key is retrieved correctly
+if not api_key:
+    raise ValueError("API_KEY not found. Make sure it's defined in the .env file.")
+
+# Set the API key for the openai module
+openai.api_key = api_key
+
+# Create a chat completion
+try:
+    chat_completion = openai.ChatCompletion.create(
+        model="davinci-002",  # Use the correct model name
+        messages=[
+            {
+                "role": "user",
+                "content": "Say this is a test",
+            }
+        ]
+    )
+
+    # Print the response
+    print(chat_completion)
+except Exception as e:
+    print(f"Error occurred: {e}")
 
 tokens = [
  
