@@ -1,39 +1,33 @@
 import ply.lex as lex
 import ply.yacc as yacc
-# import google.generativeai as genai
-# from dotenv import load_dotenv
-# import os
+import google.generativeai as genai
+from dotenv import load_dotenv
+import os
 
-# load_dotenv()
+load_dotenv()
 
-# # Retrieve the API key from environment variables
-# key = os.getenv('API_KEY')
+# Retrieve the API key from environment variables
+key = os.getenv('API_KEY')
 
-# genai.configure(api_key=key)
+genai.configure(api_key=key)
 
-# # Create the model
-# # See https://ai.google.dev/api/python/google/generativeai/GenerativeModel
-# generation_config = {
-#   "temperature": 0.5,
-#   "top_p": 0.95,
-#   "top_k": 64,
-#   "max_output_tokens": 240,
-#   "response_mime_type": "text/plain",
-# }
+# Create the model
+# See https://ai.google.dev/api/python/google/generativeai/GenerativeModel
+generation_config = {
+  "temperature": 0.5,
+  "top_p": 0.95,
+  "top_k": 64,
+  "max_output_tokens": 1024,
+  "response_mime_type": "text/plain",
+}
 
-# model = genai.GenerativeModel(
-#   model_name="gemini-1.5-flash",
-#   generation_config=generation_config,
-#   # safety_settings = Adjust safety settings
-#   # See https://ai.google.dev/gemini-api/docs/safety-settings
-# )
+model = genai.GenerativeModel(
+  model_name="gemini-1.5-flash",
+  generation_config=generation_config,
+  # safety_settings = Adjust safety settings
+  # See https://ai.google.dev/gemini-api/docs/safety-settings
+)
 
-# chat_session = model.start_chat(
-#   history=[
-#   ]
-# )
-# response = chat_session.send_message("Explain the meaning of big O")
-# print(response.text)
 
 # Token definitions
 tokens = ['LAMBDA', 'DOT', 'LPAREN', 'RPAREN', 'VAR']
@@ -104,17 +98,33 @@ def p_error(p):
 
 parser = yacc.yacc()
 
-# Test the lexer and parser
-def test_parser(input_string):
-    lexer.input(input_string)
-    for token in lexer:
-        print(f"Token: {token.type}, Value: {token.value}")
+def run_interpreter():
+    while True:
+        try:
+            # Prompt user for input
+            s = input("Enter expression (or 'exit' to quit): ")
+            if s.strip().lower() == 'exit':
+                print("Arion 5 Rocket... oops... I mean Mission Aborted!")
+                break
 
-    result = parser.parse(input_string)
-    print("Parsed Result:", result)
+            # Tokenize and parse the input
+            lexer.input(s)
+            for token in lexer:
+                print(f"Token: {token.type}, Value: {token.value}")
+            chat_session = model.start_chat(
+              history=[
+              ]
+            )
+            response = chat_session.send_message("Use BETA reduction to solve " + s +" and show steps. The '#' is the lambda symbol")
+            print(response.text)
+            result = parser.parse(s)
+            print("Parsed Result:", result)
 
-# Test examples
-test_parser("a")
-test_parser("#x.x")
-test_parser("(#x.#y.yx)")
-test_parser("fa")
+        except EOFError:
+            print("Exiting...")
+            break
+        except Exception as e:
+            print(f"Error: {e}")
+
+# Start the interpreter
+run_interpreter()
