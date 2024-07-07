@@ -166,11 +166,10 @@ def blast_off():
             # Tokenize and parse the input
             lexer.input(s)
             for token in lexer:
-                print(f"Token: {token.type}, Value: {token.value}")
+                print(f"Token: {token.type} →{token.value}")
 
             # Parse the input expression
             ast = parse_expression(s)
-            print("Original AST:", ast)
 
             if ast:
                 reduced_ast, steps = to_normal_form(ast)
