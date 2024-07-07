@@ -1,8 +1,16 @@
+#Name             |  github
+#Leondre Bromfield|  @Leon-dre
+#Tichina Buckle   |  @Tichina
+#Orville Cole     |  @villas_cole1838
+#Nathan Williams  |  @Natjoe
+
+
 import ply.lex as lex
 import ply.yacc as yacc
 import google.generativeai as genai
 from dotenv import load_dotenv
 import os
+import logging
 
 load_dotenv()
 
@@ -11,8 +19,7 @@ key = os.getenv('API_KEY')
 
 genai.configure(api_key=key)
 
-# Create the model
-# See https://ai.google.dev/api/python/google/generativeai/GenerativeModel
+# Create the Gemini model
 generation_config = {
   "temperature": 0.5,
   "top_p": 0.95,
@@ -24,20 +31,19 @@ generation_config = {
 model = genai.GenerativeModel(
   model_name="gemini-1.5-flash",
   generation_config=generation_config,
-  # safety_settings = Adjust safety settings
-  # See https://ai.google.dev/gemini-api/docs/safety-settings
 )
 
 
-# Token definitions
+# YACC Tokens
 tokens = ['LAMBDA', 'DOT', 'LPAREN', 'RPAREN', 'VAR']
 
+# regular expressions
 t_LAMBDA = r'\#'
 t_DOT = r'\.'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
 
-t_ignore = ' \t'# Ignore spaces and tabs
+t_ignore = ' \t'# Ignores spaces and escape
 
 def t_VAR(t):
     r'[a-z]'
@@ -93,10 +99,13 @@ def p_arg_func_arg(p):
     'arg : LPAREN func arg RPAREN'
     p[0] = ('func_arg', p[2], p[3])
 
+#error handling
 def p_error(p):
     print(f"Syntax error at '{p.value}'")
 
 parser = yacc.yacc()
+
+#logging
 
 def run_interpreter():
     while True:
