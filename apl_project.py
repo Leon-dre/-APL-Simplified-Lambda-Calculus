@@ -93,6 +93,7 @@ def p_error(p):
 parser = yacc.yacc()
 
 #logging
+
 # Beta reduction function block start
 def replace(var, expr, replacement):
     if expr[0] == 'var':
