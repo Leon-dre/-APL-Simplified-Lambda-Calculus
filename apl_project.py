@@ -142,7 +142,7 @@ def to_normal_form(expr):
     return expr, reduction_steps - 1
 #Beta reduction function block end
 
-#Error handling code for parser
+#Error handling code for the parser
 def parse_expression(data):
     try:
         ast = parser.parse(data)
@@ -154,33 +154,36 @@ def parse_expression(data):
         print(f"Error: {e}")
         return None
 
+#main function
 def blast_off():
     while True:
         try:
-            # Prompt user for input
+            # s is for user input
             s = input("Enter expression (or 'exit' to exit the application): ")
             if s.strip().lower() == 'exit':
+               #exit message/easter egg from APL class
                 print("Arion 5 Rocket... oops... I mean Mission Aborted!")
                 break
 
             # Tokenize and parse the input
             lexer.input(s)
             for token in lexer:
-                print(f"Token: {token.type} →{token.value}")
+               #output the tokens
+                print(f"Token: {token.type} → {token.value}")
 
-            # Parse the input expression
+            #calls the parse function to validate the user input/check for errors as well
             ast = parse_expression(s)
 
             if ast:
                 reduced_ast, steps = to_normal_form(ast)
-                
+                #checks if it can be reduced
                 if steps == 0:
-                    print("The expression is already in normal form.")
+                    print("The expression is already in normal form. Cannot be reduced.")
+                    #another check to see if it can be reduced
                 elif steps > 0:
                     print("Reduced AST:", reduced_ast)
                     print("Reduced Expression in Normal Form:", to_string(reduced_ast))
-                    
-                    # Assuming 'model.start_chat' is a valid method for starting a chat session
+                  
                     try:
                         chat_session = model.start_chat(history=[])
                         question = (
@@ -193,7 +196,7 @@ def blast_off():
                     except NameError:
                         print("Chat session model is not defined. Skipping chat interaction.")
             else:
-                print("Failed to parse the expression. No reduction performed.")
+                print("Failed to parse the expression. No reduction performed.") #error message if it cannot be parsed.
                
         except EOFError:
             print("Exiting...")
