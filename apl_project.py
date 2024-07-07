@@ -51,9 +51,11 @@ def t_VAR(t):
 
 def t_error(t):
     if t.value[0].isupper():
-        print(f"Illegal character '{t.value[0]}'. Character must be lowercase.")
+        print(f"[Lex] Illegal character '{t.value[0]}'. Character must be lowercase.")
+    elif t.value[0].isdigit():
+        print(f"[Lex] Illegal character '{t.value[0]}'. No number values allowed.")
     else:
-        print(f"Illegal character '{t.value[0]}' detected.")
+        print(f"[Lex] Illegal character '{t.value[0]}' detected.")
     t.lexer.skip(1)
 
 lexer = lex.lex()
@@ -83,7 +85,10 @@ def p_expr_parens(p):
     
 #error handling
 def p_error(p):
-    print(f"Syntax error at '{p.value}'")
+    if p:
+        print(f"Syntax error: Unexpected token '{p.value}' at position {p.lexpos}.")
+    else:
+        print("Syntax error: Unexpected end of input.")
 
 parser = yacc.yacc()
 
@@ -128,11 +133,25 @@ def to_string(expr):
 
 def to_normal_form(expr):
     prev_expr = None
+    reduction_steps = 0
     while expr != prev_expr:
         prev_expr = expr
         expr = beta(expr)
-    return expr
+        reduction_steps += 1
+    return expr, reduction_steps - 1
 #Beta reduction function block end
+
+#Error handling code for parser
+def parse_expression(data):
+    try:
+        ast = parser.parse(data)
+        if ast is None:
+            raise ValueError("Failed to parse the expression.")
+        print("Original AST:", ast)
+        return ast
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
 
 def blast_off():
     while True:
@@ -147,22 +166,34 @@ def blast_off():
             lexer.input(s)
             for token in lexer:
                 print(f"Token: {token.type}, Value: {token.value}")
-            
-            data = (s)
-            ast = parser.parse(data)
+
+            # Parse the input expression
+            ast = parse_expression(s)
             print("Original AST:", ast)
-            
+
             if ast:
-               reduced_ast = to_normal_form(ast)
-               print("Reduced AST:", reduced_ast)
-               print("Reduced Expression in Normal Form:", to_string(reduced_ast))
-               chat_session = model.start_chat(
-               history=[]
-               )  
-               response = chat_session.send_message("(Imagine that the '#' is a Lambda symbol). Explain how we got to " +to_string(reduced_ast) + "from " +s+ " in terms of BETA reduction from Lambda Calculus.")
-               print(response.text)
+                reduced_ast, steps = to_normal_form(ast)
+                
+                if steps == 0:
+                    print("The expression is already in normal form.")
+                elif steps > 0:
+                    print("Reduced AST:", reduced_ast)
+                    print("Reduced Expression in Normal Form:", to_string(reduced_ast))
+                    
+                    # Assuming 'model.start_chat' is a valid method for starting a chat session
+                    try:
+                        chat_session = model.start_chat(history=[])
+                        question = (
+                            f"(Imagine that the '#' is a Lambda symbol). "
+                            f"Explain how we got to {to_string(reduced_ast)} from {s} "
+                            "in terms of BETA reduction from Lambda Calculus."
+                        )
+                        response = chat_session.send_message(question)
+                        print(response.text)
+                    except NameError:
+                        print("Chat session model is not defined. Skipping chat interaction.")
             else:
-               print("Failed to parse the expression.")
+                print("Failed to parse the expression. No reduction performed.")
                
         except EOFError:
             print("Exiting...")
