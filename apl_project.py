@@ -93,6 +93,16 @@ def p_error(p):
 parser = yacc.yacc()
 
 #logging
+logging.basicConfig(
+    level = logging.DEBUG,
+    filename = "parselog.txt",
+    filemode = "w+",
+    format = "%(filename)10s:%(lineno)4d:%(message)s"
+)
+log = logging.getLogger()
+
+lex.lex(debug=True,debuglog=log)
+yacc.yacc(debug=True,debuglog=log)
 
 # Beta reduction function block start
 def replace(var, expr, replacement):
