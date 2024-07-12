@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'leftDOTleftLAMBDAleftVARDOT LAMBDA LPAREN RPAREN VARexpr : VARexpr : expr exprexpr : LAMBDA VAR DOT exprexpr : LPAREN expr RPAREN'
+_lr_signature = 'leftDOTleftLAMBDAleftVARNUMBERDOT LAMBDA LPAREN NUMBER RPAREN VARexpr : VARexpr : NUMBERexpr : expr exprexpr : LAMBDA VAR DOT exprexpr : LPAREN expr RPARENexpr : DOT NUMBER'
     
-_lr_action_items = {'VAR':([0,1,2,3,4,5,7,8,9,10,],[2,2,-1,6,2,2,2,2,-4,2,]),'LAMBDA':([0,1,2,4,5,7,8,9,10,],[3,3,-1,3,3,3,3,-4,3,]),'LPAREN':([0,1,2,4,5,7,8,9,10,],[4,4,-1,4,4,4,4,-4,-3,]),'$end':([1,2,5,9,10,],[0,-1,-2,-4,-3,]),'RPAREN':([2,5,7,9,10,],[-1,-2,9,-4,-3,]),'DOT':([6,],[8,]),}
+_lr_action_items = {'VAR':([0,1,2,3,4,6,7,9,10,11,12,13,],[2,2,-1,-2,8,2,2,-6,2,2,-5,2,]),'NUMBER':([0,1,2,3,5,6,7,9,10,11,12,13,],[3,3,-1,-2,9,3,3,-6,3,3,-5,3,]),'LAMBDA':([0,1,2,3,6,7,9,10,11,12,13,],[4,4,-1,-2,4,4,-6,4,4,-5,4,]),'LPAREN':([0,1,2,3,6,7,9,10,11,12,13,],[6,6,-1,-2,6,6,-6,6,6,-5,-4,]),'DOT':([0,1,2,3,6,7,8,9,10,11,12,13,],[5,5,-1,-2,5,5,11,-6,5,5,-5,-4,]),'$end':([1,2,3,7,9,12,13,],[0,-1,-2,-3,-6,-5,-4,]),'RPAREN':([2,3,7,9,10,12,13,],[-1,-2,-3,-6,12,-5,-4,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'expr':([0,1,4,5,7,8,10,],[1,5,7,5,5,10,5,]),}
+_lr_goto_items = {'expr':([0,1,6,7,10,11,13,],[1,7,10,7,7,13,7,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,8 +27,10 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> expr","S'",1,None,None,None),
-  ('expr -> VAR','expr',1,'p_expr_var','apl_project.py',69),
-  ('expr -> expr expr','expr',2,'p_expr_func_arg','apl_project.py',73),
-  ('expr -> LAMBDA VAR DOT expr','expr',4,'p_expr_lambda_expr','apl_project.py',77),
-  ('expr -> LPAREN expr RPAREN','expr',3,'p_expr_parens','apl_project.py',81),
+  ('expr -> VAR','expr',1,'p_expr_var','apl_project.py',74),
+  ('expr -> NUMBER','expr',1,'p_expr_number','apl_project.py',78),
+  ('expr -> expr expr','expr',2,'p_expr_func_arg','apl_project.py',82),
+  ('expr -> LAMBDA VAR DOT expr','expr',4,'p_expr_lambda_expr','apl_project.py',86),
+  ('expr -> LPAREN expr RPAREN','expr',3,'p_expr_parens','apl_project.py',90),
+  ('expr -> DOT NUMBER','expr',2,'p_expr_dot_number_error','apl_project.py',95),
 ]

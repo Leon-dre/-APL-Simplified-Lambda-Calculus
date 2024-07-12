@@ -35,7 +35,7 @@ model = genai.GenerativeModel(
 
 
 # YACC Tokens
-tokens = ['LAMBDA', 'DOT', 'LPAREN', 'RPAREN', 'VAR']
+tokens = ['LAMBDA', 'DOT', 'LPAREN', 'RPAREN', 'VAR', 'NUMBER']
 
 # regular expressions
 t_LAMBDA = r'\#'
@@ -48,12 +48,15 @@ t_ignore = ' \t'# Ignores spaces and escape
 def t_VAR(t):
     r'[a-z]'
     return t
-
+ 
+def t_NUMBER(t):
+    r'\d+'
+    t.value = int(t.value)
+    return t
+ 
 def t_error(t):
     if t.value[0].isupper():
         print(f"[Lex] Illegal character '{t.value[0]}'. Character must be lowercase.")
-    elif t.value[0].isdigit():
-        print(f"[Lex] Illegal character '{t.value[0]}'. No number values allowed.")
     else:
         print(f"[Lex] Illegal character '{t.value[0]}' detected.")
     t.lexer.skip(1)
@@ -64,12 +67,16 @@ lexer = lex.lex()
 precedence = (
     ('left', 'DOT'),
     ('left', 'LAMBDA'),
-    ('left', 'VAR')
+    ('left', 'VAR', 'NUMBER')
 )
 
 def p_expr_var(p):
     'expr : VAR'
     p[0] = ('var', p[1])
+    
+def p_expr_number(p):
+    'expr : NUMBER'
+    p[0] = ('number', p[1])
 
 def p_expr_func_arg(p):
     'expr : expr expr'
@@ -83,7 +90,14 @@ def p_expr_parens(p):
     'expr : LPAREN expr RPAREN'
     p[0] = p[2]
     
-#error handling
+# Error handling for specific illegal sequences
+def p_expr_dot_number_error(p):
+    'expr : DOT NUMBER'
+    print(f"Syntax error: Unexpected number '{p[2]}' after '.' at position {p.lexpos(2)}.")
+    p[0] = None
+
+
+
 def p_error(p):
     if p:
         print(f"Syntax error: Unexpected token '{p.value}' at position {p.lexpos}.")
@@ -111,6 +125,8 @@ def replace(var, expr, replacement):
             return replacement
         else:
             return expr
+    elif expr[0] == 'number':
+        return expr
     elif expr[0] == 'lambda':
         if expr[1] == var:
             return expr
@@ -124,7 +140,7 @@ def replace(var, expr, replacement):
 def beta(expr):
     if expr[0] == 'func_arg':
         if expr[1][0] == 'lambda':
-            return replace(expr[1][1], expr[1][2], expr[2])
+            return beta(replace(expr[1][1], expr[1][2], expr[2]))
         else:
             return ('func_arg', beta(expr[1]), beta(expr[2]))
     elif expr[0] == 'lambda':
@@ -135,6 +151,8 @@ def beta(expr):
 def to_string(expr):
     if expr[0] == 'var':
         return expr[1]
+    elif expr[0] == 'number':
+        return str(expr[1])
     elif expr[0] == 'lambda':
         return f"#{expr[1]}.{to_string(expr[2])}"
     elif expr[0] == 'func_arg':
@@ -160,6 +178,9 @@ def parse_expression(data):
             raise ValueError("Failed to parse the expression.")
         print("Original AST:", ast)
         return ast
+    except ValueError as ve:
+        print(f"ValueError: {ve}")
+        return None
     except Exception as e:
         print(f"Error: {e}")
         return None
@@ -172,7 +193,7 @@ def blast_off():
             s = input("Enter expression (or 'exit' to exit the application): ")
             if s.strip().lower() == 'exit':
                #exit message/easter egg from APL class
-                print("Arion 5 Rocket... oops... I mean Mission Aborted!")
+                print("Ariane 5 Rocket... oops... I mean Mission Aborted! [Language developed by L.Bromfield, T.Buckle, O.Cole, N.Williams]")
                 break
 
             # Tokenize and parse the input
@@ -215,4 +236,8 @@ def blast_off():
             print(f"Error: {e}")
 
 # Start the interpreter
-blast_off()
+def intro():
+   print("Welcome to the Lambda Calcus Interpreter!- [Developed by L.Bromfield, T.Buckle, O.Cole, N.Williams]")
+   blast_off()
+
+intro()
