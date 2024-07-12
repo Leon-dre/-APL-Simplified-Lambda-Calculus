@@ -96,8 +96,6 @@ def p_expr_dot_number_error(p):
     print(f"Syntax error: Unexpected number '{p[2]}' after '.' at position {p.lexpos(2)}.")
     p[0] = None
 
-
-
 def p_error(p):
     if p:
         print(f"Syntax error: Unexpected token '{p.value}' at position {p.lexpos}.")
@@ -193,7 +191,7 @@ def blast_off():
             s = input("Enter expression (or 'exit' to exit the application): ")
             if s.strip().lower() == 'exit':
                #exit message/easter egg from APL class
-                print("Ariane 5 Rocket... oops... I mean Mission Aborted! [Language developed by L.Bromfield, T.Buckle, O.Cole, N.Williams]")
+                print("Ariane 5 Rocket... colors... oops... I mean Mission Aborted! \n[Language developed by L.Bromfield, T.Buckle, O.Cole, N.Williams]")
                 break
 
             # Tokenize and parse the input
